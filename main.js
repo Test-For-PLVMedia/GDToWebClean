@@ -201,6 +201,7 @@ var processFile = function(file, imgs = null) {
         var sectionID = startElement == null ? 'start' : startElement.id;
 
         if (markdown.trim() !== "" && !settings.exclude.includes(sectionID)) {
+            markdown = turndownService.turndown(subsectionLinks) + '\n\n' + markdown;
             mdStore.push({section: sectionID, content: markdown})
         };
 
@@ -226,13 +227,12 @@ var createSubsectionLinks = function (section, linkLUT) {
     for (let i = 0; i < section.children.length; i++) {
         const e = section.children[i];
         if (e.tagName && e.tagName.toLowerCase().match(/h[0-9]/)) {
-            var level = parseInt(e.tagName[e.tagName.length - 1]);
+            var level = parseInt(e.tagName[e.tagName.length - 1]) - 1;
             const listItem = doc.createElement('li');
             const a = document.createElement('a');
             var title = e.querySelector('span').innerText;
-            var link = e.id;
             if (title.trim() !== '') {
-                a.setAttribute('href', linkLUT[link]);
+                a.setAttribute('href', linkLUT[e.id]);
                 a.innerText = title;
                 listItem.appendChild(a)
                 if (level == 0) {
